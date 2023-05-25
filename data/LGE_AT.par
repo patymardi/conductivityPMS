@@ -1,0 +1,86 @@
+# Parameter file for Atrial tachycardia
+# Parameter values have been determined from LGE, 
+# after tissue classification into fibrotic/nonfibrotic.
+
+#####################
+# GLOBAL PARAMETERS #
+#####################
+mass_lumping   = 0
+bidomain       = 0
+bidm_eqv_mono  = 1
+parab_solve    = 1         
+
+#####################
+# Solver Parameters #
+#####################
+#precond: 0=none; 1=diagonal; 2 Ichol; 3 System reduction
+#cg_precond   = 2
+#cg_tol_parab = 1.0e-7
+
+
+#######################################
+# IMP regions definition (cell model) #
+#######################################
+num_imp_regions                = 2
+imp_region[0].name             = "normal" 
+imp_region[0].num_IDs          = 1
+imp_region[0].ID[0]            = 0   
+imp_region[0].cellSurfVolRatio = 1.0
+imp_region[0].im               = "converted_COURTEMANCHE" #"Courtemanche" 
+#
+imp_region[1].name             = "fibrotic" 
+imp_region[1].num_IDs          = 1 
+imp_region[1].ID[0]            = 1 
+imp_region[1].cellSurfVolRatio = 1.0
+imp_region[1].im               = "converted_COURTEMANCHE" #"Courtemanche" 
+#imp_region[1].im_param         = "gNa*0.6,GK1*0.5,GCaL*0.5" 
+#g_Na=-40%, g_K1=-50% G_CaL=-50%
+#"JB_COURTEMANCHE" 
+imp_region[1].im_param         = "g_Na*0.6,g_K1*0.5,g_CaL*0.5" 
+
+
+
+##############################
+# Conductivity Regions (S/m) #
+##############################
+num_gregions = 2
+gregion[0].name    = "normal" 
+gregion[0].num_IDs = 1
+gregion[0].ID[0]   = 0      
+#############
+# isotropic #
+#############
+#2.0*0.1289
+gregion[0].g_il    = 0.2578  
+gregion[0].g_it    = 0.2578 
+gregion[0].g_el    = 0.2578 
+gregion[0].g_et    = 0.2578  
+###############
+# anisotropic #
+###############
+#gregion[0].g_il    = 0.2528 # 2*0.1264 
+#gregion[0].g_it    = 0.0504 # 2*0.0252
+#gregion[0].g_el    = 0.2528 # 2*0.1264 
+#gregion[0].g_et    = 0.0504 # 2*0.0252
+##########
+##########
+gregion[1].name    =  "fibrotic" 
+gregion[1].num_IDs = 1
+gregion[1].ID[0]   = 1
+#############
+# isotropic #
+#############
+#2*0.05503
+gregion[1].g_il    = 0.11006 
+gregion[1].g_it    = 0.11006 
+gregion[1].g_el    = 0.11006 
+gregion[1].g_et    = 0.11006 
+###############
+# anisotropic #
+###############
+#gregion[1].g_il    = 0.10920 # 2*0.0546
+#gregion[1].g_it    = 0.01366 # 2*0.00683 
+#gregion[1].g_el    = 0.10920 # 2*0.0546
+#gregion[1].g_et    = 0.01366 # 2*0.00683 
+
+
