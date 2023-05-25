@@ -23,6 +23,9 @@ from carputils import settings
 from carputils import tools
 from carputils import mesh
 from carputils import model
+import pyvista as pv
+import matplotlib
+
 from PSD import *
 from carp_to_pv import *
 
@@ -60,8 +63,8 @@ def parser():
                         default=0.6,
                         help='conduction velocity in m/s')
     group.add_argument('--mesh_pth',
-                        type=float, 
-                        default=None,
+                        type=str,
+                        default='../data/meshes',
                         help='file path to carp files')
     group.add_argument('--parameters_pth',
                         type=float, 
@@ -74,8 +77,16 @@ def parser():
     group.add_argument('--gil_file', type=str, default="gil.dat", help='File name where the intracellular conductivities in longitudinal direction are stored')
     group.add_argument('--gel_file', type=str, default="gel.dat", help='File name where the extracellular conductivities in longitudinal direction are stored')
     group.add_argument('--mesh',
-                        type=str, default='',
+                        type=str, default='case_1',
                         help='meshname directory. Example: case_1')
+    group.add_argument('--results_dir',
+                        type=str,
+                        default='../results',
+                        help='path to results folder')
+    group.add_argument('--selection_mode', type=str, choices=['manual', 'file'], default='manual',
+                        help='Mode for selecting the point and get ID: manual or file')
+    group.add_argument('--point_file', type=str, default='path_to_ID_file.txt',
+                        help='Path to the ID file')
 
     return parser
 
@@ -85,7 +96,9 @@ def jobID(args):
     """
     Generate name of top level output directory.
     """
-    out_DIR = os.getcwd() + '/'  + 'Sim'
+
+    today = date.today()
+    out_DIR = '{}/{}_{}'.format(args.results_dir,today.isoformat(),args.mesh)
     
     return out_DIR
 
@@ -113,15 +126,56 @@ def run(args, job):
     print('MESH HAS BEEN SETUP WITH REGION TAGS')
     print ('-----------------------------------')
 
-    xyz_pth = args.mesh_pth + '.pts'
-    triangles_pth = args.mesh_pth + '.elem'
+    xyz_pth = meshname + '.pts'
+    triangles_pth = meshname + '.elem'
     xyz = np.loadtxt(xyz_pth, skiprows=1)
     triangles = np.loadtxt(triangles_pth, skiprows=1, usecols = (1,2,3), dtype = int)
-    
-    pv_obj = carp_to_pv(args.mesh_pth)
-    point = pv_obj.point[args.node_ID]
-    centre = np.asarray(point)
+
+    #Convert carp files to vtk to visualize in Pyvista
+    pv_obj = carp_to_pv(meshname)
+
+    # Create a PyVista plotter
+    plotter = pv.Plotter()
+
+    # Add the MRI geometry to the plotter
+    plotter.add_mesh(pv_obj, color='gray')
+
+    # Define the landmarks
+    if args.selection_mode == 'manual':
+        pointxyz = select_point_manually(plotter)
+    else:
+        pointxyz = load_point_from_file(args.point_file)
+
+    #point = pv_obj.point[args.node_ID]
+    centre = np.asarray(pointxyz)
+
+    #For multiphase
     PSD(args, job, cmd, meshname, xyz, triangles,centre)
+
+    #model.induceReentry.PSD(args, job, cmd, meshname, xyz, triangles,centre)
+def select_point_manually(plotter):
+
+    # Prompt the user to select point using the PyVista plotter
+    print("Please select the point by clicking on the geometry.")
+
+    # def pick_point(mesh, event):
+    #     if event == "PointPickEvent":
+    #         landmarks.append(mesh.points[mesh.point_pick_index])
+    #         # Display the selected landmark
+    #         plotter.add_mesh(pv.PolyData(landmarks[-1]), color='red', point_size=10)
+
+    plotter.enable_point_picking(show_message="Press P to pick")
+    plotter.show()
+
+    pointID = plotter.picked_point
+    print(pointID)
+    return pointID
+
+
+def load_point_from_file(file_path):
+    return np.loadtxt(file_path)
+
+
 
 if __name__ == '__main__':
     run()
