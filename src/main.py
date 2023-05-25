@@ -3,7 +3,7 @@
 """
 Created on Thu May 25 10:58:10 2023
 
-@author: shaheim ogbomo-harmitt + conductivityPMS
+@author: Patricia Martinez + Shaheim Ogbomo-Harmitt 
 
 """
 
