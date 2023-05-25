@@ -17,6 +17,7 @@ import numpy as np
 import shutil
 import random
 from scipy import spatial
+import datetime
 from datetime import date
 import pandas as pd
 from carputils import settings
@@ -96,7 +97,7 @@ def jobID(args):
     """
     Generate name of top level output directory.
     """
-
+    now = datetime.datetime.now()
     today = date.today()
     out_DIR = '{}/{}_{}_{}_{}_{}'.format(args.results_dir,today.isoformat(),args.mesh,now.hour,now.minute,now.second)
     
