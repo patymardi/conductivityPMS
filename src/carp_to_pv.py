@@ -1,7 +1,7 @@
 """
 Created on Thu May 25 11:04:04 2023
 
-@author: shaheimogbomo-harmitt
+@author: Shaheim Ogbomo-Harmitt
 """
 
 import os 
