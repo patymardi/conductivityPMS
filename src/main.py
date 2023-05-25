@@ -138,7 +138,7 @@ def run(args, job):
     # Define the landmarks
     if args.selection_mode == 'manual':
         point_xyz = select_point_manually(pv_mesh)
-        np.savetxt('{}/point.txt'.format(args.mesh_pth),point_xyz, fmt='%f')
+        np.savetxt('{}/point.txt'.format(args.mesh_pth),point_xyz, fmt='%.10f')
     else:
         point_xyz = load_point_from_file('{}/{}'.format(args.mesh_pth,args.point_file))
 
