@@ -354,7 +354,7 @@ def assignWallValues(surfacePoints, allPoints, surfaceValues):
     # on the volumetric mesh.
 
     phi_vol = np.zeros((len(allPoints), 1), dtype=complex)
-    distance, index_node = spatial.cKDTree(surfacePoints).query(allPoints, n_jobs=-1)
+    distance, index_node = spatial.cKDTree(surfacePoints).query(allPoints)#, n_jobs=-1)
     phi_vol = surfaceValues[index_node]
 
     return phi_vol
