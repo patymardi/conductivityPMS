@@ -93,7 +93,7 @@ def run(args, job):
     
     meshname = args.mesh_pth
 
-    # Simulation parameters and conductivites - tagging all fibrosis regions with same parameters
+    # Simulation parameters and conductivites - NEED TO ADD PART OF CONDUCTIVITIES
     
     cmd = tools.carp_cmd(os.path.join(EXAMPLE_DIR, args.parameters_pth))
 
