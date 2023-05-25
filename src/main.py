@@ -98,7 +98,7 @@ def jobID(args):
     """
 
     today = date.today()
-    out_DIR = '{}/{}_{}'.format(args.results_dir,today.isoformat(),args.mesh)
+    out_DIR = '{}/{}_{}_{}_{}_{}'.format(args.results_dir,today.isoformat(),args.mesh,now.hour,now.minute,now.second)
     
     return out_DIR
 
