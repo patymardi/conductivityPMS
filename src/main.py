@@ -96,7 +96,7 @@ def run(args, job):
 
     # Simulation parameters and conductivites
     
-    cmd = tools.carp_cmd(os.path.join(EXAMPLE_DIR, args.parameters_pth))
+    cmd = tools.carp_cmd(args.parameters_pth)
 
     print ('-----------------------------------')
     print('MESH HAS BEEN SETUP WITH REGION TAGS')
