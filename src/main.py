@@ -71,6 +71,11 @@ def parser():
                         type=float, 
                         default=None,
                         help='Node ID of phase singularity node [x,y,z]')
+    group.add_argument('--gil_file', type=str, default="gil.dat", help='File name where the intracellular conductivities in longitudinal direction are stored')
+    group.add_argument('--gel_file', type=str, default="gel.dat", help='File name where the extracellular conductivities in longitudinal direction are stored')
+    group.add_argument('--mesh',
+                        type=str, default='',
+                        help='meshname directory. Example: case_1')
 
     return parser
 
@@ -92,11 +97,17 @@ def run(args, job):
     
     # Setting up mesh - path to test mesh 
     
-    meshname = args.mesh_pth
+    meshname = '{}/{}'.format(args.mesh_pth,args.mesh)
 
     # Simulation parameters and conductivites
     
     cmd = tools.carp_cmd(args.parameters_pth)
+    
+    #Read the ge_vec file with intra and extracellular conductivities
+    g_scale = ['-ge_scale_vec', '..data/{}'.format(args.gil_file),
+               '-gi_scale_vec', '..data/{}'.format(args.gel_file)]
+    
+    cmd += g_scale
 
     print ('-----------------------------------')
     print('MESH HAS BEEN SETUP WITH REGION TAGS')
