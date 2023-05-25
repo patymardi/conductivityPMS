@@ -24,6 +24,7 @@ from carputils import tools
 from carputils import mesh
 from carputils import model
 from PSD import *
+from carp_to_pv import *
 
 def parser():
     
@@ -66,10 +67,10 @@ def parser():
                         type=float, 
                         default=None,
                         help='file path to carp .par file')
-    group.add_argument('--point',
+    group.add_argument('--node_ID',
                         type=float, 
                         default=None,
-                        help='Array of point of phase singularity [x,y,z]')
+                        help='Node ID of phase singularity node [x,y,z]')
 
     return parser
 
@@ -93,23 +94,22 @@ def run(args, job):
     
     meshname = args.mesh_pth
 
-    # Simulation parameters and conductivites - NEED TO ADD PART OF CONDUCTIVITIES
+    # Simulation parameters and conductivites - tagging all fibrosis regions with same parameters
     
     cmd = tools.carp_cmd(os.path.join(EXAMPLE_DIR, args.parameters_pth))
 
     print ('-----------------------------------')
     print('MESH HAS BEEN SETUP WITH REGION TAGS')
     print ('-----------------------------------')
-    
-    simid = job.ID
+
     xyz_pth = args.mesh_pth + '.pts'
     triangles_pth = args.mesh_pth + '.elem'
     xyz = np.loadtxt(xyz_pth, skiprows=1)
     triangles = np.loadtxt(triangles_pth, skiprows=1, usecols = (1,2,3), dtype = int)
     
-    # CHANGE PATH FOR DIFFERENT AF SCENARIO
-    
-    centre = np.asarray(args.point)
+    pv_obj = carp_to_pv(args.mesh_pth)
+    point = pv_obj.point[args.node_ID]
+    centre = np.asarray(point)
     PSD(args, job, cmd, meshname, xyz, triangles,centre)
 
 if __name__ == '__main__':
