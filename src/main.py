@@ -85,8 +85,8 @@ def parser():
                         help='path to results folder')
     group.add_argument('--selection_mode', type=str, choices=['manual', 'file'], default='manual',
                         help='Mode for selecting the point and get ID: manual or file')
-    group.add_argument('--point_file', type=str, default='path_to_ID_file.txt',
-                        help='Path to the ID file')
+    group.add_argument('--point_file', type=str, default='point.txt',
+                        help='Point ID file name')
 
     return parser
 
@@ -132,48 +132,48 @@ def run(args, job):
     triangles = np.loadtxt(triangles_pth, skiprows=1, usecols = (1,2,3), dtype = int)
 
     #Convert carp files to vtk to visualize in Pyvista
-    pv_obj = carp_to_pv(meshname)
-
-    # Create a PyVista plotter
-    plotter = pv.Plotter()
-
-    # Add the MRI geometry to the plotter
-    plotter.add_mesh(pv_obj, color='gray')
+    pv_mesh = pv.read('temp.vtk')
+    #pv_mesh = carp_to_pv(meshname)
 
     # Define the landmarks
     if args.selection_mode == 'manual':
-        pointxyz = select_point_manually(plotter)
+        point_xyz = select_point_manually(pv_mesh)
+        np.savetxt('{}/point.txt'.format(args.mesh_pth),point_xyz, fmt='%f')
     else:
-        pointxyz = load_point_from_file(args.point_file)
+        point_xyz = load_point_from_file('{}/{}'.format(args.mesh_pth,args.point_file))
 
     #point = pv_obj.point[args.node_ID]
-    centre = np.asarray(pointxyz)
+    centre = np.asarray(point_xyz)
 
     #For multiphase
     PSD(args, job, cmd, meshname, xyz, triangles,centre)
 
     #model.induceReentry.PSD(args, job, cmd, meshname, xyz, triangles,centre)
-def select_point_manually(plotter):
+
+def select_point_manually(pv_mesh):
+
+    # Create a PyVista plotter
+    plotter = pv.Plotter()
+
+    # Add the MRI geometry to the plotter
+    plotter.add_mesh(pv_mesh, color='blue')
 
     # Prompt the user to select point using the PyVista plotter
     print("Please select the point by clicking on the geometry.")
-
-    # def pick_point(mesh, event):
-    #     if event == "PointPickEvent":
-    #         landmarks.append(mesh.points[mesh.point_pick_index])
-    #         # Display the selected landmark
-    #         plotter.add_mesh(pv.PolyData(landmarks[-1]), color='red', point_size=10)
+    plotter.add_text('Select the point and then close the window', position='lower_left')
 
     plotter.enable_point_picking(show_message="Press P to pick")
     plotter.show()
+    point_xyz = plotter.picked_point
 
-    pointID = plotter.picked_point
-    print(pointID)
-    return pointID
+    print("Coordinates: ", point_xyz)
+    plotter.close()
+
+    return point_xyz
 
 
 def load_point_from_file(file_path):
-    return np.loadtxt(file_path)
+    return np.loadtxt(file_path,dtype=float)
 
 
 
